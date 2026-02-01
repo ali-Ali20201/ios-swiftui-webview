@@ -17,7 +17,7 @@ class ContentViewModel: ObservableObject{
     
     @Published var loading : Bool = false
     @Published var title : String =  ""
-    @Published var address = "https://www.google.com"
+    @Published var address = "https://reliable-kitten-129242.netlify.app"
     
 }
 
