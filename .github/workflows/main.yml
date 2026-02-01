@@ -5,24 +5,15 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Force Build
+      - name: Build
         run: |
-          # البحث عن ملف المشروع تلقائياً لتجنب أخطاء التسمية
           PROJ=$(ls -d *.xcodeproj | head -n 1)
-          SCHEME=$(xcodebuild -list -project "$PROJ" | grep -A 5 "Schemes:" | tail -n 1 | xargs)
-          
-          echo "Building: $PROJ with Scheme: $SCHEME"
-          
-          # بناء التطبيق بصيغة Release
-          xcodebuild build -project "$PROJ" -scheme "$SCHEME" -sdk iphoneos CODE_SIGNING_ALLOWED=NO -configuration Release -derivedDataPath build_data
-          
-          # تجميع ملف الـ IPA يدوياً لضمان المساحة الصحيحة
+          xcodebuild build -project "$PROJ" -scheme webview -sdk iphoneos CODE_SIGNING_ALLOWED=NO -configuration Release -derivedDataPath build_data
           mkdir -p Payload
           find build_data -name "*.app" -exec cp -r {} Payload/ \;
-          zip -r MyFinalApp.ipa Payload
-          
+          zip -r MyApp.ipa Payload
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: App-Ready-To-Sign
-          path: MyFinalApp.ipa
+          name: Full-App-IPA
+          path: MyApp.ipa
