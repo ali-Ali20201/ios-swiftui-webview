@@ -7,13 +7,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build
         run: |
+          # تحديد اسم المشروع والـ Scheme تلقائياً
           PROJ=$(ls -d *.xcodeproj | head -n 1)
-          xcodebuild build -project "$PROJ" -scheme webview -sdk iphoneos CODE_SIGNING_ALLOWED=NO -configuration Release -derivedDataPath build_data
+          SCHEME="webview" # هذا هو الاسم الافتراضي في المستودع الذي تستخدمه
+          
+          xcodebuild archive -project "$PROJ" -scheme "$SCHEME" -archivePath "$PWD/build/$SCHEME.xcarchive" -sdk iphoneos -configuration Release CODE_SIGNING_ALLOWED=NO
+          
           mkdir -p Payload
-          find build_data -name "*.app" -exec cp -r {} Payload/ \;
-          zip -r MyApp.ipa Payload
+          cp -r build/$SCHEME.xcarchive/Products/Applications/*.app Payload/
+          zip -r MyFinalApp.ipa Payload
+          
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: Full-App-IPA
-          path: MyApp.ipa
+          name: App-Ready
+          path: MyFinalApp.ipa
